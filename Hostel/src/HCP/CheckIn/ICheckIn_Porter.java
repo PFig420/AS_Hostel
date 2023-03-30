@@ -9,5 +9,5 @@ package HCP.CheckIn;
  * @author omp
  */
 public interface ICheckIn_Porter {
-    void callCustomers(int porterId);
+   
 }

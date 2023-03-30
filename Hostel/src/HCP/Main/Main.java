@@ -35,13 +35,13 @@ public class Main extends javax.swing.JFrame {
     private static void initHCP() {
         // the user must define the port number
         System.out.println("Start of simulation");
-        int ttlCustomers = 12;
+        int ttlCustomers = 1;
         int port = 0;
         ILog mLog = MLog.getInstance();
         Thread tServer = new Thread(TServer.getInstance(port, (ILog_CCP)mLog));
         tServer.start();
 
-        IOutside OutCustomer = MOutside.getInstance();
+        /*IOutside OutCustomer = MOutside.getInstance();
         ICheckIn CustCheckin = MCheckIn.getInstance(mLog);
         
         OutCustomer.nextSimulation(ttlCustomers);
@@ -51,7 +51,7 @@ public class Main extends javax.swing.JFrame {
         
       
         new Thread( TPorter.getInstance(0, (IOutside_Porter)OutCustomer, (ICheckIn_Porter) CustCheckin, ttlCustomers)).start();
-        
+        */
         try {
             tServer.join();
         } catch (InterruptedException ex) {}

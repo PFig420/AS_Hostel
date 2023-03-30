@@ -4,6 +4,9 @@
  */
 package HCP.ActiveEntity;
 
+import HCP.Bedroom.IBedroom;
+import HCP.Bedroom.MBedroom;
+import HCP.Bedroom.IBedroom_Customer;
 import HCP.CheckIn.ICheckIn_Customer;
 import HCP.Outside.IOutside_Customer;
 /**
@@ -15,6 +18,7 @@ public class TCustomer implements Runnable {
     private final int customerId;
     private final IOutside_Customer mOutside;
     private final ICheckIn_Customer mCheckIn;
+    private IBedroom mBedroom = null;
     
     private TCustomer(int customerId, IOutside_Customer mOutside, ICheckIn_Customer mCheckIn) {
         this.customerId = customerId;
@@ -24,14 +28,19 @@ public class TCustomer implements Runnable {
     public static Runnable getInstance(int customerId, IOutside_Customer mOutside, ICheckIn_Customer mCheckIn) {
         return new TCustomer(customerId, mOutside, mCheckIn);
     }
+    
+    public void setBedroom(IBedroom iB){
+        this.mBedroom = iB;
+    }
     @Override
     public void run() {
         
-        System.out.println(customerId);
         mOutside.walkArround(customerId);
         mOutside.waitTurn(customerId);
         mCheckIn.inQueue(customerId);
-        // getBedandRoom(customerId) -> mCheckIn
+        IBedroom iB = mCheckIn.assignRoomToCustomer(customerId);
+        setBedroom(iB);
+        mBedroom.goToSleep(customerId);
         // moveIn(customerId, BedId) -> mBedRoom
         // useBathroom(customerId, BedId?maybe) -> mBedRoom
         // goDown(customerId)???

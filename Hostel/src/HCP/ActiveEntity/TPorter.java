@@ -23,8 +23,8 @@ public class TPorter implements Runnable {
 
     @Override
     public void run() {
-        
-        mOutside.comeIn(6);
+        System.out.print("Total Customers for Porter: "+ ttlCustomers+"\n");
+        mOutside.comeIn(this.ttlCustomers);
         // CallForCheckIn(int porterId, TCustomer[] customers) -> mCheckIn //Opens door and calls customer into fifo queue for checkin, then closes door
         // CheckOut(int porterId,TCustomer[] customers) -> mLeavingHall    // Opens door to leave
     }

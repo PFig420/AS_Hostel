@@ -4,11 +4,28 @@
  */
 package CCP.Main;
 
+import Utils.IMessage;
+import Utils.Message;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author omp
  */
 public class Main extends javax.swing.JFrame {
+    private static Socket echoSocket = null;
+    private static ObjectOutputStream out = null;
+    private static ObjectInputStream in = null;
+    private static final String HOST = "localhost";
+    private static final int PORT = 5000;
 
     /**
      * Creates new form Main
@@ -106,6 +123,11 @@ public class Main extends javax.swing.JFrame {
         });
 
         jButton3.setText("CheckIn");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("CheckOut");
 
@@ -264,14 +286,36 @@ public class Main extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        System.out.print("JButton2");
+        
+        int nCustomers = (Integer) jSpinner1.getValue();
+        int tci = (Integer) jSpinner2.getValue();
+        int tbr = (Integer) jSpinner3.getValue();
+        int tbf = (Integer) jSpinner4.getValue();
+        int[] values = {nCustomers, tci, tbr, tbf};
+        
+        IMessage msgOut = Message.getInstance("Next Simulation", values );
+        //System.out.print(nCustomers);
+        //System.out.print();
+        try {
+            //in.readObject().toString;
+            out.writeObject(msgOut);
+            out.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        // TODO add your handling code here:
+       jButton5.setEnabled(false);
+       jButton6.setEnabled(false);
+       jButton7.setEnabled(false);
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-        // TODO add your handling code here:
+        jButton5.setEnabled(true);
+        jButton6.setEnabled(true);
+        jButton7.setEnabled(true);
     }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -282,7 +326,54 @@ public class Main extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton7ActionPerformed
 
-    /**
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        System.out.print("JButton3");
+        int[] a = {};
+        IMessage msgOut = Message.getInstance("CheckIN", a );
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+ 
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup ButtonMode;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
+    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem2;
+    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JComboBox<String> jComboBox2;
+    private javax.swing.JComboBox<String> jComboBox4;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
+    private javax.swing.JSpinner jSpinner1;
+    private javax.swing.JSpinner jSpinner2;
+    private javax.swing.JSpinner jSpinner3;
+    private javax.swing.JSpinner jSpinner4;
+    // End of variables declaration//GEN-END:variables
+
+
+
+   /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -313,35 +404,54 @@ public class Main extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> {
             new Main().setVisible(true);
         });
-    }
+        String hostName = "localhost";
+        Socket kkSocket = null;
+        boolean portNumberValid = false;
+        while(!portNumberValid){
+            try{
+                String portString = javax.swing.JOptionPane.showInputDialog("Server Port", 8082);
+                int port = Integer.parseInt(portString);
+                echoSocket = new Socket(hostName, port);
+                out = new ObjectOutputStream( echoSocket.getOutputStream() );
+                in = new ObjectInputStream( echoSocket.getInputStream() );
+                portNumberValid = true;
+            } catch (UnknownHostException e) {
+                javax.swing.JOptionPane.showMessageDialog(null, "Don't know about host " + hostName);
+                
+            } catch (IOException e) {
+                javax.swing.JOptionPane.showMessageDialog(null, "Couldn't get I/O for the connection to " +
+                    hostName + "\nMake sure the server is running");
+                
+            } catch(NumberFormatException e){
+                javax.swing.JOptionPane.showMessageDialog(null, "Input port is not a valid port. Example: 8081");
+                
+            }
+                          
+        }
+        System.out.println( "Connection is established with the Server" );
+        BufferedReader stdIn = new BufferedReader( new InputStreamReader( System.in ) );
+        int value = 0;
+        String code;
+        while( true ) {
+            
+            /*code = stdIn.readLine();
+            IMessage msgOut = Message.getInstance(code, value++ );
+            out.writeObject( msgOut );
+            Message msgIn = (Message) in.readObject();
+            msgIn.print("Client");
+            if ( code.toLowerCase().contains("bye") )
+                break;*/
+        }
+        // System.out.println("OUT client");
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup ButtonMode;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
-    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem2;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox4;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JSpinner jSpinner2;
-    private javax.swing.JSpinner jSpinner3;
-    private javax.swing.JSpinner jSpinner4;
-    // End of variables declaration//GEN-END:variables
+    }
+    
+    //jButton2 - Start Simulation
+    //jButton3 - CheckIn
+    //jButton4 - CheckOut
+    //jButton5 - Step
+    //jButton6 - Suspend
+    //jButton7 - Restart
+
+
 }

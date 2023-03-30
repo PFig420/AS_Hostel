@@ -14,4 +14,8 @@ public interface ILog_Customer {
     public void isFull(int customerId);
 
     public void out(int order, int count, int customerId);
+    void in( int head, int count, int id );
+    void recepcionist(int id);
+    void custAsleep(int id, int roomNumber, int floorNumber);
+ 
 }

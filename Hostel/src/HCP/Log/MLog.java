@@ -20,7 +20,7 @@ public class MLog implements ILog {
     private final ReentrantLock rl;
     boolean append = true;
     File file = new File("logger.txt");  
-    fileWrt = new FileWriter(file);
+    //fileWrt = new FileWriter(file);
 
     //Logger logger = Logger.getLogger("com.javacodegeeks.snippets.core");
     
@@ -34,7 +34,8 @@ public class MLog implements ILog {
     public void meh_inQueue(int customerId) {
         try {
             rl.lock();
-            files.write("Files in Java might be tricky, but it is fun enough!");
+            System.out.println("Inside the queue "+customerId+"\n");
+            //files.write("Files in Java might be tricky, but it is fun enough!");
         } finally {
             rl.unlock();
         }
@@ -46,6 +47,7 @@ public class MLog implements ILog {
     public void ccp_idle() {
         try {
             rl.lock();
+            System.out.println("I'm idle");
         } finally {
             rl.unlock();
         }
@@ -53,11 +55,54 @@ public class MLog implements ILog {
 
     @Override
     public void isFull(int customerId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+         try {
+            rl.lock();
+            System.out.println("Queue is Full.\n");
+        } finally {
+            rl.unlock();
+        }
+    }
+    
+    public void in( int head, int count, int id ) {
+       
+        try {
+            rl.lock();
+            System.out.println("In: " + head + ", " + count + ", " + id+"\n");
+        } finally {
+            rl.unlock();
+        }
     }
 
     @Override
     public void out(int order, int count, int customerId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+         try {
+            rl.lock();
+            System.out.println("Out: " + order + ", " + count + ", " + customerId+"\n");
+        } finally {
+            rl.unlock();
+        }
     }
+
+    @Override
+    public void recepcionist(int id) {
+         try {
+            rl.lock();
+             System.out.print("Recepcionist "+id+" is on.\n");
+        } finally {
+            rl.unlock();
+        }
+         
+    }
+
+    @Override
+    public void custAsleep(int id, int roomNumber, int floorNumber) {
+      try {
+            rl.lock();
+             System.out.print("Customer "+id+" is asleep in room "+floorNumber+roomNumber+"\n");
+        } finally {
+            rl.unlock();
+        }
+    }
+    
+    
 }

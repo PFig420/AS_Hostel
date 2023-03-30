@@ -4,10 +4,13 @@
  */
 package HCP.CheckIn;
 
+import HCP.Bedroom.IBedroom;
+
 /**
  *
  * @author omp
  */
 public interface ICheckIn_Customer {
     void inQueue(int customerId);
+    IBedroom assignRoomToCustomer(int customerId);
 }

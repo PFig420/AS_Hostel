@@ -1,5 +1,5 @@
 package HCP.Bedroom;
 
-public interface IBedroom_Customer {
-    
+public interface IBedroom_Customer  extends IBedroom{
+
 }

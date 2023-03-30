@@ -39,10 +39,12 @@ public class MOutside implements IOutside {
     @Override
     public void walkArround(int customerId){
         try {
+            //System.out.print("Walking around: customer " + customerId+"\n");
             rl.lock();
             while( ttlCustomers == 0 )
                 cWalkArround.await();
             ttlCustomers--;
+           
         } catch (InterruptedException ex) {
         } finally {
    
@@ -52,6 +54,7 @@ public class MOutside implements IOutside {
     @Override
     public void comeIn(int nCustomers) {
         try {
+            //System.out.print("Porter in COmein");
             rl.lock();
             this.nCustomers = nCustomers;
             cWaitTurn.signalAll();
@@ -66,7 +69,7 @@ public class MOutside implements IOutside {
     @Override
     public void waitTurn(int customerId) {
         try {
-  
+            
             rl.lock();
             while ( nCustomers == 0 ) {
                 try {

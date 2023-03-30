@@ -18,6 +18,8 @@ public class TReceptionist implements Runnable {
 
     @Override
     public void run() {
+      
+        mCheckIn.nextCustomer(receptionistId);
         // AssignRoomToCustomerAtCheckIn(int recepcionistId, TCustomer customer)
         
         
