@@ -17,5 +17,15 @@ public interface ILog_Customer {
     void in( int head, int count, int id );
     void recepcionist(int id);
     void custAsleep(int id, int roomNumber, int floorNumber);
+
+    void goToBath(int customerId, int roomNumber, int floorNumber);
+
+    void satDown(int customerId);
+
+    void waiterReadyToDeliverFood(int waiterId);
+
+    void gotBreakfast(int customerId);
+
+    public void AwaitingToLeave(int customerId);
  
 }

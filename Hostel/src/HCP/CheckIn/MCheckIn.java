@@ -4,9 +4,12 @@
  */
 package HCP.CheckIn;
 
+import HCP.ActiveEntity.TWaiter;
 import HCP.Bedroom.IBedroom;
 import HCP.Bedroom.MBedroom;
 import HCP.Log.ILog_Customer;
+import HCP.MealRoom.IMealRoom;
+import HCP.MealRoom.IMealRoom_Waiter;
 import Utils.Message;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,11 +22,16 @@ import java.util.logging.Logger;
 public class MCheckIn implements ICheckIn {
 
    
-    private final ReentrantLock rl;
+    private ReentrantLock rl;
+    private final ReentrantLock rl2;
     private final ILog_Customer mLogCustomer;
     private final Condition cIsFull;
     private final Condition cWakeUp;
     private final Condition cRecepcionist;
+    private final Condition cManual;
+    private IMealRoom mMealRoom = null;
+    private int mrCustomers = 0;
+    private boolean manual = false;
     private final int size = 6;
     private int head = 0;
     private int tail = 0;
@@ -38,10 +46,12 @@ public class MCheckIn implements ICheckIn {
     
     private MCheckIn(ILog_Customer mLogCustomer) {
         rl = new ReentrantLock();
+        rl2 = new ReentrantLock();
         this.mLogCustomer = mLogCustomer;
         cIsFull = rl.newCondition();
         cWakeUp = rl.newCondition();
         cRecepcionist = rl.newCondition();
+        cManual = rl2.newCondition();
         for (int i = 0; i < 3; i++) {
             floor1[i] = MBedroom.getInstance((ILog_Customer)mLogCustomer, i, 1);
             floor2[i] = MBedroom.getInstance((ILog_Customer)mLogCustomer, i, 2);
@@ -59,43 +69,53 @@ public class MCheckIn implements ICheckIn {
     }
     @Override
     public void inQueue(int customerId){
-       
         int order;
-        try {
-            rl.lock();
-            mLogCustomer.meh_inQueue(customerId);
-            while ( isFull() ) {
-                try {
-                    mLogCustomer.isFull(tail);
-                    cIsFull.await();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        rl.lock();
+        mLogCustomer.meh_inQueue(customerId);
+        while ( isFull() ) {
+            try {
+                 if(isFull()){
+                        mLogCustomer.isFull(tail);
+                 }
+                
+                cIsFull.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
             }
-            mLogCustomer.in( head, count, customerId);
-            count++;
+        }
+        mLogCustomer.in( head, count, customerId);
+        count++;
+        order = head++;
+        if(manual){
            
-            order = head++;
-            while ( wakeUp == 0 || order != tail )
                 try {
-                    cWakeUp.await();
+                    rl2.lock();
+                    cManual.await();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+                }  finally {
+                    rl2.unlock();
                 }
-            wakeUp--;
-            tail++;
-            if ( wakeUp > 0 && isNotEmpty() )
-                cWakeUp.signalAll();
-            if ( isFull() )
-                cIsFull.signalAll();
-            count--;
-            mLogCustomer.out(order, count, customerId);
-            /*for(int k=0; k<3; k++){
-                System.out.println(floor1[k].toString());
-            };*/
-        } finally {
-            rl.unlock();
+            
         }
+        while ( wakeUp == 0 || order != tail )
+            try {
+                cWakeUp.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        wakeUp--;
+        tail++;
+        if ( wakeUp > 0 && isNotEmpty() )
+            cWakeUp.signalAll();
+        if ( isFull() )
+            cIsFull.signalAll();
+        count--;
+        mLogCustomer.out(order, count, customerId);
+        /*for(int k=0; k<3; k++){
+        System.out.println(floor1[k].toString());
+        };*/
+        rl.unlock();
     }
     /**
      *
@@ -113,13 +133,12 @@ public class MCheckIn implements ICheckIn {
        } catch( Exception ex ){}
         finally {
             rl.unlock();
-            
-                
-               
                 try {
+                    rl.lock();
                     cRecepcionist.await();
                 } catch( Exception ex ){}
                 finally { 
+                    rl.unlock();
                     if (count != 0){
                         nextCustomer(receptionistId);
                     }
@@ -152,7 +171,6 @@ public class MCheckIn implements ICheckIn {
                    justGotRoom += 1;
                    floor1[i].newCustomer();
                    if (justGotRoom == 3){
-                       System.out.println("Resetting");
                        cRecepcionist.signalAll();
                        justGotRoom = 0;
                    }
@@ -188,4 +206,45 @@ public class MCheckIn implements ICheckIn {
         }
         return null;
     }
+
+    @Override
+    public void setMode() {
+        manual = true;
+        
+    }
+
+    @Override
+    public void advanceToNextStep() {
+       
+        rl2.lock();
+        cManual.signalAll();
+        rl2.unlock();
+    }
+
+    @Override
+    public void wakeUpFloor1(IMealRoom mMealRoom, int ttlCustomers) {
+        this.mMealRoom = mMealRoom;
+        this.mrCustomers = ttlCustomers;
+        new Thread( TWaiter.getInstance(0, (IMealRoom_Waiter) mMealRoom, ttlCustomers)).start();
+        for (int i = 0; i < 3; i++) {
+            floor1[i].wakeUp();   
+        }
+    }
+    
+    @Override
+    public void wakeUpFloor2() {
+        for (int i = 0; i < 3; i++) {
+            new Thread( TWaiter.getInstance(0, (IMealRoom_Waiter) mMealRoom, mrCustomers)).start();
+            floor2[i].wakeUp();   
+        }
+    }
+    
+    @Override
+    public void wakeUpFloor3() {
+        for (int i = 0; i < 3; i++) {
+            new Thread( TWaiter.getInstance(0, (IMealRoom_Waiter) mMealRoom, mrCustomers)).start();
+            floor3[i].wakeUp();   
+        }
+    }
+    
 }

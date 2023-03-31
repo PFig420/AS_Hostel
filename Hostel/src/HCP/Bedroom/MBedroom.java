@@ -4,7 +4,7 @@ import HCP.Log.ILog_Customer;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class MBedroom implements IBedroom_Customer {
+public class MBedroom implements IBedroom {
     private final int nBeds = 3;
     private final int nBaths = 1;
     private int customersInRoom = 0;
@@ -40,12 +40,42 @@ public class MBedroom implements IBedroom_Customer {
     }
     
     public void goToSleep(int customerId){
-         try {
+        try {
+            
             mLogCustomer.custAsleep(customerId, roomNumber, floorNumber);
             rl.lock();
             
                 cSleep.await();
           
+        } catch( Exception ex ){}
+        finally {
+            rl.unlock();
+             
+        }
+    }
+    @Override
+    public void goToBathroom(int customerId) {
+        try {
+            
+            mLogCustomer.goToBath(customerId, roomNumber, floorNumber);
+            rl.lock();
+                Thread.sleep(1000);
+                customersInRoom--;
+                //cSleep.await();
+          
+        } catch( Exception ex ){}
+        finally {
+            
+            rl.unlock();
+            
+        }
+        
+    }
+    @Override
+    public void wakeUp() {
+          try {
+            rl.lock();
+                cSleep.signalAll();
        } catch( Exception ex ){}
         finally {
             rl.unlock();
@@ -69,4 +99,6 @@ public class MBedroom implements IBedroom_Customer {
     public boolean isFull() {
        return nBeds == customersInRoom;
     }
+
+
 }

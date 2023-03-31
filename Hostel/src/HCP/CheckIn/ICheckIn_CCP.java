@@ -9,4 +9,5 @@ package HCP.CheckIn;
  * @author omp
  */
 public interface ICheckIn_CCP {
+    void setMode();
 }

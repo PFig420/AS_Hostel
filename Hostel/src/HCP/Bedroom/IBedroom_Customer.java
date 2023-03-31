@@ -1,5 +1,7 @@
 package HCP.Bedroom;
 
-public interface IBedroom_Customer  extends IBedroom{
-
+public interface IBedroom_Customer{
+    boolean isFull();
+    void wakeUp();
+    void goToBathroom(int customerId);
 }

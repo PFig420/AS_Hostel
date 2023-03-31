@@ -103,6 +103,68 @@ public class MLog implements ILog {
             rl.unlock();
         }
     }
-    
-    
+
+    @Override
+    public void porterCall() {
+        try {
+            rl.lock();
+             System.out.print("Porter call to customers: Service Open\n");
+        } finally {
+            rl.unlock();
+        }
+       
+    }
+
+    @Override
+    public void goToBath(int customerId, int roomNumber, int floorNumber) {
+        try {
+            rl.lock();
+             System.out.print("Customer "+customerId+" has woken up in room "+floorNumber+roomNumber+"\n");
+        } finally {
+            rl.unlock();
+        }
+    }
+
+    @Override
+    public void satDown(int customerId) {
+        try {
+            rl.lock();
+             System.out.print("Customer "+customerId+" has sat down at breakfast table.\n");
+        } finally {
+            rl.unlock();
+        }
+    }
+
+    @Override
+    public void waiterReadyToDeliverFood(int waiterId) {
+       try {
+            rl.lock();
+             System.out.print("Waiter "+waiterId+" ready to deliver food.\n");
+        } finally {
+            rl.unlock();
+        }
+    }
+
+    @Override
+    public void gotBreakfast(int customerId) {
+         try {
+            rl.lock();
+             System.out.print("Customer "+customerId+" got breakfast.\n");
+        } finally {
+            rl.unlock();
+        } }
+
+    @Override
+    public void AwaitingToLeave(int customerId) {
+         try {
+            rl.lock();
+             System.out.print("Customer "+customerId+" is waiting to leave.\n");
+        } finally {
+            rl.unlock();
+        } 
+    }
 }
+    
+    
+    
+

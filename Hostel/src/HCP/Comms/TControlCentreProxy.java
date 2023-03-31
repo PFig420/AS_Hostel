@@ -7,14 +7,23 @@ package HCP.Comms;
 import HCP.ActiveEntity.TCustomer;
 import HCP.ActiveEntity.TPorter;
 import HCP.ActiveEntity.TReceptionist;
+import HCP.ActiveEntity.TWaiter;
 import HCP.CheckIn.ICheckIn;
 import HCP.CheckIn.ICheckIn_Customer;
 import HCP.CheckIn.ICheckIn_Porter;
 import HCP.CheckIn.ICheckIn_Receptionist;
 import HCP.CheckIn.MCheckIn;
+import HCP.LeavingHall.ILeavingHall;
+import HCP.LeavingHall.ILeavingHall_Customer;
+import HCP.LeavingHall.ILeavingHall_Porter;
+import HCP.LeavingHall.MLeavingHall;
 import java.net.Socket;
 import HCP.Log.ILog_CCP;
 import HCP.Log.ILog_Customer;
+import HCP.MealRoom.IMealRoom;
+import HCP.MealRoom.IMealRoom_Customer;
+import HCP.MealRoom.IMealRoom_Waiter;
+import HCP.MealRoom.MMealRoom;
 import HCP.Outside.IOutside;
 import HCP.Outside.IOutside_Customer;
 import HCP.Outside.IOutside_Porter;
@@ -41,6 +50,9 @@ public class TControlCentreProxy implements Runnable {
     private final ObjectInputStream in;
     private IOutside OutCustomer = MOutside.getInstance();
     private ICheckIn CustCheckin = null;
+    private IMealRoom mMealRoom = null;
+    private final ILeavingHall mLeavingHall;
+    private int floorsChecked = 0;
     
     private TControlCentreProxy(Socket socket, ILog_CCP mLogMessage) throws IOException {
         this.socket = socket;
@@ -48,6 +60,8 @@ public class TControlCentreProxy implements Runnable {
         this.out = new ObjectOutputStream( this.socket.getOutputStream() );
         this.in = new ObjectInputStream( this.socket.getInputStream() );
         this.CustCheckin = MCheckIn.getInstance((ILog_Customer) mLogMessage);
+        this.mMealRoom = MMealRoom.getInstance((ILog_Customer) mLogMessage, this.CustCheckin);
+        this.mLeavingHall = MLeavingHall.getInstance((ILog_Customer) mLogMessage);
         
     }
     public static Runnable getInstance(Socket socket, ILog_CCP mLogMessage) throws IOException {
@@ -57,16 +71,37 @@ public class TControlCentreProxy implements Runnable {
     private void createNewSimulation(int ttlCustomers, int tci, int tbr, int tbf){
        
         OutCustomer.nextSimulation(ttlCustomers);
+        mMealRoom.setttlCustomers(ttlCustomers);
         for ( int i=0; i< ttlCustomers; i++)
-            new Thread( TCustomer.getInstance(i, (IOutside_Customer)OutCustomer, (ICheckIn_Customer) CustCheckin)).start();
+            new Thread( TCustomer.getInstance(i, (IOutside_Customer)OutCustomer, (ICheckIn_Customer) CustCheckin, (IMealRoom) mMealRoom, (ILeavingHall_Customer) mLeavingHall)).start();
     }
     
-    private void callForCheckIn(){
-          new Thread( TPorter.getInstance(0, (IOutside_Porter)OutCustomer, (ICheckIn_Porter) CustCheckin, ttlCustomers)).start();
+    private void callForCheckIn(int[] value){
+         if(value[0] == 1){
+            
+              CustCheckin.setMode();
+              OutCustomer.setMode();
+          }
+          new Thread( TPorter.getInstance(0, (IOutside_Porter)OutCustomer, (ICheckIn_Porter) CustCheckin, ttlCustomers, (ILeavingHall_Porter) mLeavingHall)).start();
           for ( int i=0; i< 3; i++)
             new Thread( TReceptionist.getInstance(i, (ICheckIn_Receptionist) CustCheckin)).start();
-   
           
+         
+    }
+    private void callForCheckOut(int[] value){
+         if(value[0] == 1){
+            
+              //CustCheckin.setMode();
+              OutCustomer.setMode();
+          }
+          /*new Thread( TPorter.getInstance(0, (IOutside_Porter)OutCustomer, (ICheckIn_Porter) CustCheckin, ttlCustomers)).start();
+          for ( int i=0; i< 3; i++)
+            new Thread( TReceptionist.getInstance(i, (ICheckIn_Receptionist) CustCheckin)).start();*/
+          
+        
+        CustCheckin.wakeUpFloor1(mMealRoom, ttlCustomers);
+        
+      
     }
     @Override
     public void run() {
@@ -87,8 +122,16 @@ public class TControlCentreProxy implements Runnable {
                    ttlCustomers = values[0];
                };
                if (s.code().equals("CheckIN")){
-                   callForCheckIn();
+                   callForCheckIn(s.value());
                };
+                if (s.code().equals("Step")){
+                  CustCheckin.advanceToNextStep();
+                  OutCustomer.advanceToNextStep();
+               };
+                if (s.code().equals("CheckOUT")){
+                   callForCheckOut(s.value());
+               };
+              
           
                
             

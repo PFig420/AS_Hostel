@@ -10,7 +10,8 @@ package HCP.Outside;
  */
 public interface IOutside extends IOutside_Porter, IOutside_Customer {
 
-    public void nextSimulation(int i);
-
+    void nextSimulation(int i);
+    void setMode();
+    void advanceToNextStep();
     
 }

@@ -130,6 +130,11 @@ public class Main extends javax.swing.JFrame {
         });
 
         jButton4.setText("CheckOut");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         ButtonMode.add(jRadioButton1);
         jRadioButton1.setText("Automatic");
@@ -150,6 +155,11 @@ public class Main extends javax.swing.JFrame {
         jLabel5.setText("Operating Mode");
 
         jButton5.setText("Step");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         jButton6.setText("Suspend");
         jButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -326,10 +336,21 @@ public class Main extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton7ActionPerformed
 
+
+    @SuppressWarnings("empty-statement")
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
         System.out.print("JButton3");
-        int[] a = {};
+       
+        int[] a = {0};
+        
+        if(jRadioButton1.isSelected()){ //Automatico
+            a[0] = 0;
+        }
+        if(jRadioButton2.isSelected()){ //Manual
+            a[0] = 1;
+        }
+        
         IMessage msgOut = Message.getInstance("CheckIN", a );
         try {
             out.writeObject(msgOut);
@@ -339,6 +360,38 @@ public class Main extends javax.swing.JFrame {
         }
       
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+         System.out.print("JButton5");
+        int[] a = {};
+        IMessage msgOut = Message.getInstance("Step", a );
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        int[] a = {0};
+         if(jRadioButton1.isSelected()){ //Automatico
+            a[0] = 0;
+        }
+        if(jRadioButton2.isSelected()){ //Manual
+            a[0] = 1;
+        }
+        IMessage msgOut = Message.getInstance("CheckOUT", a );
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
 
  
     // Variables declaration - do not modify//GEN-BEGIN:variables
