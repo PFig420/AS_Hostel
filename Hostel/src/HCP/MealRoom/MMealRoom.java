@@ -124,15 +124,32 @@ public class MMealRoom implements IMealRoom{
             curCustomers--;
             ttlCustomers--;
             rl.unlock();
-            /*System.out.print(curCustomers);
-            System.out.print(ttlCustomers);
-            System.out.print(curCustomers == 0 && ttlCustomers != 0);
-            System.out.print("\n");*/
             if(curCustomers == 0 && ttlCustomers != 0){
                 if(secondFloorClear){
+                    if(manual){
+                        try {
+                            rl2.lock();
+                            cManual.await();
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+                        }  finally {
+                            rl2.unlock();
+                        }
+                    }
                     mCheckIn.wakeUpFloor3();
                 }
                 else{
+                    if(manual){
+                        
+                        try {
+                            rl2.lock();
+                            cManual.await();
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+                        }  finally {
+                            rl2.unlock();
+                        }
+                    }
                     mCheckIn.wakeUpFloor2();
                     secondFloorClear = true;
                 }
@@ -147,6 +164,21 @@ public class MMealRoom implements IMealRoom{
     @Override
     public void settbf(int tbf) {
         this.tbf = tbf;
+    }
+    
+    @Override
+    public void setMode() {
+        System.out.println("MODE IS SET");
+        manual = true;     
+    }
+    
+    public void advanceToNextStep() {
+       
+       
+        rl2.lock();
+            cManual.signalAll();
+        rl2.unlock();
+         
     }
 
 }

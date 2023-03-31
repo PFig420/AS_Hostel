@@ -29,6 +29,7 @@ public class MCheckIn implements ICheckIn {
     private final Condition cWakeUp;
     private final Condition cRecepcionist;
     private final Condition cManual;
+    private final Condition cManualInQueue;
     private IMealRoom mMealRoom = null;
     private int mrCustomers = 0;
     private boolean manual = false;
@@ -38,6 +39,7 @@ public class MCheckIn implements ICheckIn {
     private int tail = 0;
     private int wakeUp = 0;
     private int count = 0;
+    private int countMan = 0; 
     
     private int justGotRoom = 0;
     private IBedroom[] floor1 = {null, null, null};
@@ -54,6 +56,7 @@ public class MCheckIn implements ICheckIn {
         cWakeUp = rl.newCondition();
         cRecepcionist = rl.newCondition();
         cManual = rl2.newCondition();
+        cManualInQueue = rl2.newCondition();
         for (int i = 0; i < 3; i++) {
             floor1[i] = MBedroom.getInstance((ILog_Customer)mLogCustomer, i, 1);
             floor2[i] = MBedroom.getInstance((ILog_Customer)mLogCustomer, i, 2);
@@ -71,25 +74,63 @@ public class MCheckIn implements ICheckIn {
     }
     @Override
     public void inQueue(int customerId){
+        //System.out.println("HEllo");
+       
         int order;
         rl.lock();
-        mLogCustomer.meh_inQueue(customerId);
+         
+        
         while ( isFull() ) {
             try {
-                 if(isFull()){
-                        mLogCustomer.isFull(tail);
-                 }
+                
                 
                 cIsFull.await();
             } catch (InterruptedException ex) {
                 Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+          //mLogCustomer.meh_inQueue(customerId);
+         if(manual){
+            if(countMan == size){
+                try {
+                    countMan = countMan - 3;
+                    rl2.lock();
+                    cManualInQueue.await();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+                }  finally {
+                    rl2.unlock();
+                }
+            }
+            countMan++;
+        }
         mLogCustomer.in( head, count, customerId);
         count++;
         order = head++;
+        
+        
+        while ( wakeUp == 0 || order != tail )
+            try {
+                cWakeUp.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        wakeUp--;
+        tail++;
+        
+        if ( wakeUp > 0 && isNotEmpty() )
+            cWakeUp.signalAll();
+        if ( isFull() )
+            cIsFull.signalAll();
+        count--;
+        
+        //mLogCustomer.out(order, count, customerId);
+        /*for(int k=0; k<3; k++){
+        System.out.println(floor1[k].toString());
+        };*/
+        rl.unlock();
         if(manual){
-           
+            
                 try {
                     rl2.lock();
                     cManual.await();
@@ -99,25 +140,8 @@ public class MCheckIn implements ICheckIn {
                     rl2.unlock();
                 }
             
+            
         }
-        while ( wakeUp == 0 || order != tail )
-            try {
-                cWakeUp.await();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        wakeUp--;
-        tail++;
-        if ( wakeUp > 0 && isNotEmpty() )
-            cWakeUp.signalAll();
-        if ( isFull() )
-            cIsFull.signalAll();
-        count--;
-        mLogCustomer.out(order, count, customerId);
-        /*for(int k=0; k<3; k++){
-        System.out.println(floor1[k].toString());
-        };*/
-        rl.unlock();
     }
     /**
      *
@@ -164,6 +188,7 @@ public class MCheckIn implements ICheckIn {
      */
     @Override
     public IBedroom assignRoomToCustomer(int customerId) {
+        
         try {
             //mLogCustomer.recepcionist(receptionistId);
             rl.lock();
@@ -211,15 +236,18 @@ public class MCheckIn implements ICheckIn {
 
     @Override
     public void setMode() {
-        manual = true;
-        
+        manual = true;     
     }
 
     @Override
     public void advanceToNextStep() {
        
+       
         rl2.lock();
-        cManual.signalAll();
+            cManual.signalAll();
+        rl2.unlock();
+         rl2.lock();
+            cManualInQueue.signalAll();
         rl2.unlock();
     }
 

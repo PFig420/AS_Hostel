@@ -44,7 +44,7 @@ public class MLeavingHall implements ILeavingHall{
     @Override
     public void waitToLeave(int customerId) {
         curCustomers++;
-        System.out.println(curCustomers == ttlCustomers);
+        //System.out.println(curCustomers == ttlCustomers);
         if(curCustomers == ttlCustomers){
             
            
