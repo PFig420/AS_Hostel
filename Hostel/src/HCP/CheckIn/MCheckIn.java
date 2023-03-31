@@ -33,6 +33,7 @@ public class MCheckIn implements ICheckIn {
     private int mrCustomers = 0;
     private boolean manual = false;
     private final int size = 6;
+    private int tci;
     private int head = 0;
     private int tail = 0;
     private int wakeUp = 0;
@@ -42,6 +43,7 @@ public class MCheckIn implements ICheckIn {
     private IBedroom[] floor1 = {null, null, null};
     private IBedroom[] floor2 = {null, null, null};
     private IBedroom[] floor3 = {null, null, null};
+    private int tbr;
     
     
     private MCheckIn(ILog_Customer mLogCustomer) {
@@ -165,7 +167,7 @@ public class MCheckIn implements ICheckIn {
         try {
             //mLogCustomer.recepcionist(receptionistId);
             rl.lock();
-            
+            Thread.sleep(tci);
             for (int i = 0; i < 3; i++) {
                if(!floor1[i].isFull()){ // se o quarto ainda tem camas vazias
                    justGotRoom += 1;
@@ -244,6 +246,20 @@ public class MCheckIn implements ICheckIn {
         for (int i = 0; i < 3; i++) {
             new Thread( TWaiter.getInstance(0, (IMealRoom_Waiter) mMealRoom, mrCustomers)).start();
             floor3[i].wakeUp();   
+        }
+    }
+    
+    @Override
+    public void settci(int tci){
+        this.tci = tci;
+    }
+    @Override
+    public void settbr(int tbr){
+        this.tbr = tbr;
+        for (int i = 0; i < 3; i++) {
+            floor1[i].settbr(this.tbr);
+            floor2[i].settbr(this.tbr);
+            floor3[i].settbr(this.tbr);
         }
     }
     

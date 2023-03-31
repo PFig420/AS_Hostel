@@ -27,5 +27,9 @@ public interface ILog_Customer {
     void gotBreakfast(int customerId);
 
     public void AwaitingToLeave(int customerId);
+
+    public void WaitingToOpenDoor(int porterId);
+
+    public void walking(int customerId);
  
 }

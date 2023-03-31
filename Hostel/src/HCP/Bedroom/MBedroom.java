@@ -10,6 +10,7 @@ public class MBedroom implements IBedroom {
     private int customersInRoom = 0;
     private int roomNumber;
     private int floorNumber;
+    private int tbr;
     
     
     
@@ -59,7 +60,7 @@ public class MBedroom implements IBedroom {
             
             mLogCustomer.goToBath(customerId, roomNumber, floorNumber);
             rl.lock();
-                Thread.sleep(1000);
+                Thread.sleep(tbr);
                 customersInRoom--;
                 //cSleep.await();
           
@@ -98,6 +99,11 @@ public class MBedroom implements IBedroom {
     @Override
     public boolean isFull() {
        return nBeds == customersInRoom;
+    }
+    
+    @Override
+    public void settbr(int tbr){
+        this.tbr = tbr;
     }
 
 

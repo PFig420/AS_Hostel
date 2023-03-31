@@ -4,8 +4,8 @@ public interface IBedroom extends IBedroom_Customer{
     
 
     void goToSleep(int customerId);
-
-    public void newCustomer();
+    void settbr(int tbr);
+    void newCustomer();
 
     
     

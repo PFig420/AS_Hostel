@@ -48,17 +48,19 @@ public class TControlCentreProxy implements Runnable {
     private final ILog_CCP mLogMessage;
     private final ObjectOutputStream out;
     private final ObjectInputStream in;
-    private IOutside OutCustomer = MOutside.getInstance();
+    private IOutside OutCustomer ;
     private ICheckIn CustCheckin = null;
     private IMealRoom mMealRoom = null;
     private final ILeavingHall mLeavingHall;
     private int floorsChecked = 0;
+    private int tci,tbr,tbf;
     
     private TControlCentreProxy(Socket socket, ILog_CCP mLogMessage) throws IOException {
         this.socket = socket;
         this.mLogMessage = mLogMessage;
         this.out = new ObjectOutputStream( this.socket.getOutputStream() );
         this.in = new ObjectInputStream( this.socket.getInputStream() );
+        this.OutCustomer =MOutside.getInstance((ILog_Customer) mLogMessage);
         this.CustCheckin = MCheckIn.getInstance((ILog_Customer) mLogMessage);
         this.mMealRoom = MMealRoom.getInstance((ILog_Customer) mLogMessage, this.CustCheckin);
         this.mLeavingHall = MLeavingHall.getInstance((ILog_Customer) mLogMessage);
@@ -69,9 +71,15 @@ public class TControlCentreProxy implements Runnable {
     }
     
     private void createNewSimulation(int ttlCustomers, int tci, int tbr, int tbf){
+        this.tci = tci;
+        this.tbr = tbr;
+        this.tbf = tbf;
        
         OutCustomer.nextSimulation(ttlCustomers);
         mMealRoom.setttlCustomers(ttlCustomers);
+        CustCheckin.settci(this.tci);
+        CustCheckin.settbr(this.tbr);
+        mMealRoom.settbf(this.tbf);
         for ( int i=0; i< ttlCustomers; i++)
             new Thread( TCustomer.getInstance(i, (IOutside_Customer)OutCustomer, (ICheckIn_Customer) CustCheckin, (IMealRoom) mMealRoom, (ILeavingHall_Customer) mLeavingHall)).start();
     }

@@ -24,6 +24,7 @@ public class MMealRoom implements IMealRoom{
     private int curCustomers = 0;
     private int ttlCustomers = 0;
     private ICheckIn mCheckIn;
+    private int tbf;
    
     
     
@@ -114,7 +115,7 @@ public class MMealRoom implements IMealRoom{
             
             mLogCustomer.gotBreakfast(customerId);
             rl.lock();
-                Thread.sleep(1000);
+                Thread.sleep(tbf);
                
                 //cSleep.await();
           
@@ -141,6 +142,11 @@ public class MMealRoom implements IMealRoom{
            
             
         }  
+    }
+
+    @Override
+    public void settbf(int tbf) {
+        this.tbf = tbf;
     }
 
 }

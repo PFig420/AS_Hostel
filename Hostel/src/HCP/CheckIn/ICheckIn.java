@@ -20,4 +20,8 @@ public interface ICheckIn extends ICheckIn_Customer, ICheckIn_Porter, ICheckIn_R
     public void wakeUpFloor1(IMealRoom mMealRoom, int ttlCustomers);
     public void wakeUpFloor2();
     public void wakeUpFloor3();
+
+    void settci(int tci);
+    void settbr(int tbr);
+    
 }

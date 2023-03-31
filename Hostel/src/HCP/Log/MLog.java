@@ -163,6 +163,26 @@ public class MLog implements ILog {
             rl.unlock();
         } 
     }
+
+    @Override
+    public void WaitingToOpenDoor(int porterId) {
+        try {
+            rl.lock();
+             System.out.print("Porter "+porterId+" awaiting to open the door.\n");
+        } finally {
+            rl.unlock();
+        } 
+    }
+
+    @Override
+    public void walking(int customerId) {
+        try {
+            rl.lock();
+             System.out.print("Customer "+customerId+" is walking outside.\n");
+        } finally {
+            rl.unlock();
+        } 
+    }
 }
     
     

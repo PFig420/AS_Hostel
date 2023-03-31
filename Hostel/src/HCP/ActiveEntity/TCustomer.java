@@ -53,6 +53,7 @@ public class TCustomer implements Runnable {
         mMealRoom.sitAtTable(customerId);
         mMealRoom.getBreakfast(customerId);
         mLeavingHall.waitToLeave(customerId);
+        mOutside.walkArround(customerId);
         // eatBreakfast(customerId) -> mMealRoom
         // loungeAround(customerId) -> mLeavingHall 
         // checkout(customerId) -> mLeavingHall

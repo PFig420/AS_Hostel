@@ -23,19 +23,21 @@ public class MOutside implements IOutside {
     private final Condition cManual;
     private final Condition cWalkArround;
     private final Condition cWaitTurn;
+    private final ILog_Customer mLogCustomer;
    
     private boolean manual = false;
     
-    private MOutside() {
+    private MOutside(ILog_Customer mLogCustomer) {
         rl = new ReentrantLock();
         rl2 = new ReentrantLock();
         cWalkArround = rl.newCondition();
         cWaitTurn = rl.newCondition();
         cManual = rl2.newCondition();
+         this.mLogCustomer = mLogCustomer;
         
     }
-    public static IOutside getInstance() {
-        return new MOutside();
+    public static IOutside getInstance(ILog_Customer mLogCustomer) {
+        return new MOutside(mLogCustomer);
     }
     public void nextSimulation(int ttlCustomers) {
         try {
@@ -50,6 +52,7 @@ public class MOutside implements IOutside {
     @Override
     public void walkArround(int customerId){
         try {
+            mLogCustomer.walking(customerId);
             //System.out.print("Walking around: customer " + customerId+"\n");
             rl.lock();
             while( ttlCustomers == 0 )
