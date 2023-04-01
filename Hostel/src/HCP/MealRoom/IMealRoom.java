@@ -8,5 +8,9 @@ public interface IMealRoom extends IMealRoom_Customer,IMealRoom_Waiter {
     void setMode();
 
     void advanceToNextStep();
+
+    void suspend();
+
+    void restart();
     
 }

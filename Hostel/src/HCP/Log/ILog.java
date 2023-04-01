@@ -9,5 +9,6 @@ package HCP.Log;
  * @author omp
  */
 public interface ILog extends ILog_Customer, ILog_CCP{
-    void porterCall();
+    
+    
 }

@@ -14,4 +14,6 @@ public interface ILog_CCP {
      *
      */
     void ccp_idle();
+
+    public void sendRun();
 }

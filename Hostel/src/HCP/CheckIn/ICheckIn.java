@@ -23,5 +23,11 @@ public interface ICheckIn extends ICheckIn_Customer, ICheckIn_Porter, ICheckIn_R
 
     void settci(int tci);
     void settbr(int tbr);
+
+    public void suspend();
+
+    public void restart();
+
+  
     
 }

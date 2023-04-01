@@ -18,6 +18,10 @@ public class MLeavingHall implements ILeavingHall{
     private int curCustomers = 0;
     private int ttlCustomers = 0;
     
+    private ReentrantLock rlSuspension;
+    private final Condition cSuspension;
+    private boolean suspend = false;
+    
     
     
     
@@ -25,12 +29,13 @@ public class MLeavingHall implements ILeavingHall{
         rl = new ReentrantLock();
         rl2 = new ReentrantLock();
         rlDoor = new ReentrantLock();
+        rlSuspension = new ReentrantLock();
         this.mLogCustomer = mLogCustomer;
        
         cManual = rl2.newCondition();
         cRoom = rl.newCondition();
         cDoor = rlDoor.newCondition();
-       
+        cSuspension = rlSuspension.newCondition();
     }
     /**
      *
@@ -43,6 +48,16 @@ public class MLeavingHall implements ILeavingHall{
 
     @Override
     public void waitToLeave(int customerId) {
+          if(suspend){
+            try {
+                rlSuspension.lock();
+                cSuspension.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MLeavingHall.class.getName()).log(Level.SEVERE, null, ex);
+            }  finally {
+                rlSuspension.unlock();
+            }
+        }
         curCustomers++;
         //System.out.println(curCustomers == ttlCustomers);
         if(curCustomers == ttlCustomers){
@@ -53,7 +68,7 @@ public class MLeavingHall implements ILeavingHall{
             rlDoor.unlock();
         }
         try {
-            mLogCustomer.AwaitingToLeave(customerId);
+            //mLogCustomer.AwaitingToLeave(customerId);
             rl.lock();
           
                 cRoom.await();
@@ -82,9 +97,21 @@ public class MLeavingHall implements ILeavingHall{
         } finally {
             rlDoor.unlock();
         }
-        mLogCustomer.WaitingToOpenDoor(porterId);
+        //mLogCustomer.WaitingToOpenDoor(porterId);
         rl.lock();
             cRoom.signalAll();
         rl.unlock();
+    }
+
+    @Override
+    public void suspend() {
+        suspend = true;
+    }
+     @Override
+    public void restart() {
+        suspend = false;
+        rlSuspension.lock();
+        cSuspension.signalAll();
+        rlSuspension.unlock();
     }
 }

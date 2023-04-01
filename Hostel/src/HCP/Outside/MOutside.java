@@ -24,15 +24,20 @@ public class MOutside implements IOutside {
     private final Condition cWalkArround;
     private final Condition cWaitTurn;
     private final ILog_Customer mLogCustomer;
+    private ReentrantLock rlSuspension;
+    private final Condition cSuspension;
+    private boolean suspend = false;
    
     private boolean manual = false;
     
     private MOutside(ILog_Customer mLogCustomer) {
         rl = new ReentrantLock();
+        rlSuspension = new ReentrantLock();
         rl2 = new ReentrantLock();
         cWalkArround = rl.newCondition();
         cWaitTurn = rl.newCondition();
         cManual = rl2.newCondition();
+        cSuspension = rlSuspension.newCondition();
          this.mLogCustomer = mLogCustomer;
         
     }
@@ -51,8 +56,18 @@ public class MOutside implements IOutside {
     }
     @Override
     public void walkArround(int customerId){
+        if(suspend){
+            try {
+                rlSuspension.lock();
+                cSuspension.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+            }  finally {
+                rlSuspension.unlock();
+            }
+        }
         try {
-            mLogCustomer.walking(customerId);
+            //mLogCustomer.walking(customerId);
             //System.out.print("Walking around: customer " + customerId+"\n");
             rl.lock();
             while( ttlCustomers == 0 )
@@ -67,7 +82,8 @@ public class MOutside implements IOutside {
     }
     @Override
     public void comeIn(int nCustomers) {
-         
+        mLogCustomer.sendCheckin();
+        mLogCustomer.sendOpen();
         try {
            
             rl.lock();
@@ -84,7 +100,16 @@ public class MOutside implements IOutside {
      */
     @Override
     public void waitTurn(int customerId) {
-       
+        if(suspend){
+            try {
+                rlSuspension.lock();
+                cSuspension.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+            }  finally {
+                rlSuspension.unlock();
+            }
+        }
          
        
         try {
@@ -132,5 +157,18 @@ public class MOutside implements IOutside {
         } finally {
             rl2.unlock();
         }
+    }
+    
+    @Override
+    public void suspend() {
+        suspend = true;
+    }
+    
+     @Override
+    public void restart() {
+        suspend = false;
+        rlSuspension.lock();
+        cSuspension.signalAll();
+        rlSuspension.unlock();
     }
 }

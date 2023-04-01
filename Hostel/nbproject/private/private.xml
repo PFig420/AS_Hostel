@@ -3,21 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/ActiveEntity/TPorter.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/Main/Main.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/LeavingHall/MLeavingHall.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/Outside/MOutside.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/Log/MLog.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/Bedroom/MBedroom.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/MealRoom/IMealRoom_Waiter.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/MealRoom/MMealRoom.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/ActiveEntity/TCustomer.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/ActiveEntity/TWaiter.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/Comms/TControlCentreProxy.java</file>
             <file>file:/home/pedro/NetBeansProjects/Hostel/src/CCP/Main/Main.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/CheckIn/MCheckIn.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/LeavingHall/ILeavingHall.java</file>
-            <file>file:/home/pedro/NetBeansProjects/Hostel/src/HCP/Log/ILog_Customer.java</file>
         </group>
     </open-files>
 </project-private>

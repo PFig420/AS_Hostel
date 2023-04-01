@@ -25,6 +25,10 @@ public class MMealRoom implements IMealRoom{
     private int ttlCustomers = 0;
     private ICheckIn mCheckIn;
     private int tbf;
+    
+    private ReentrantLock rlSuspension;
+    private final Condition cSuspension;
+    private boolean suspend = false;
    
     
     
@@ -32,11 +36,13 @@ public class MMealRoom implements IMealRoom{
         rl = new ReentrantLock();
         rl2 = new ReentrantLock();
         rl3 = new ReentrantLock();
+        rlSuspension = new ReentrantLock();
         this.mLogCustomer = mLogCustomer;
         this.mCheckIn = mCheckIn;
         cManual = rl2.newCondition();
         cTable = rl.newCondition();
         cWaiterAlert = rl3.newCondition();
+        cSuspension = rlSuspension.newCondition();
     }
     /**
      *
@@ -53,6 +59,16 @@ public class MMealRoom implements IMealRoom{
     }
     
     public void sitAtTable(int customerId){
+        if(suspend){
+            try {
+                rlSuspension.lock();
+                cSuspension.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+            }  finally {
+                rlSuspension.unlock();
+            }
+        }
         curCustomers++;
         if(curCustomers%9 == 0 || ttlCustomers - curCustomers == 0){
             try {
@@ -66,7 +82,7 @@ public class MMealRoom implements IMealRoom{
             }
         }
         try {
-            mLogCustomer.satDown(customerId);
+            //mLogCustomer.satDown(customerId);
             rl.lock();
                 cTable.await();
                 
@@ -80,6 +96,7 @@ public class MMealRoom implements IMealRoom{
     @Override
     public void deliverFood(int waiterId) {
         
+        
         try {
             
             rl3.lock();
@@ -89,7 +106,7 @@ public class MMealRoom implements IMealRoom{
             rl3.unlock();
         }
         try {
-            mLogCustomer.waiterReadyToDeliverFood(waiterId);
+            //mLogCustomer.waiterReadyToDeliverFood(waiterId);
             rl.lock();
           
                 cTable.signalAll();
@@ -111,9 +128,19 @@ public class MMealRoom implements IMealRoom{
 
     @Override
     public void getBreakfast(int customerId) {
+        if(suspend){
+            try {
+                rlSuspension.lock();
+                cSuspension.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+            }  finally {
+                rlSuspension.unlock();
+            }
+        }
           try {
             
-            mLogCustomer.gotBreakfast(customerId);
+            //mLogCustomer.gotBreakfast(customerId);
             rl.lock();
                 Thread.sleep(tbf);
                
@@ -173,12 +200,22 @@ public class MMealRoom implements IMealRoom{
     }
     
     public void advanceToNextStep() {
-       
-       
         rl2.lock();
             cManual.signalAll();
         rl2.unlock();
-         
+    }
+    
+    @Override
+    public void suspend() {
+        suspend = true;
+    }
+
+    @Override
+    public void restart() {
+        suspend = false;
+        rlSuspension.lock();
+        cSuspension.signalAll();
+        rlSuspension.unlock();
     }
 
 }

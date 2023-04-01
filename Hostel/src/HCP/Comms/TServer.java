@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import HCP.Log.ILog_CCP;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
@@ -21,6 +22,7 @@ public class TServer implements Runnable{
     private static int threadId = 1;
     private ServerSocket serverSocket;
     private final ILog_CCP mLogMessage;
+  
 
     public static Runnable getInstance(int port, ILog_CCP mLogMessage) {
         return new TServer(8081, mLogMessage);
@@ -38,12 +40,12 @@ public class TServer implements Runnable{
         } catch (IOException ex) {
             Logger.getLogger(TServer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println( "Server is listening on port: " + PORT );
+        //System.out.println( "Server is listening on port: " + PORT );
       
        while( true ) {
 
             try {
-                System.out.println( "Server is accepting a new connection" );
+                //System.out.println( "Server is accepting a new connection" );
                 clientSocket = serverSocket.accept();
                
                 new Thread( TControlCentreProxy.getInstance(clientSocket, mLogMessage)).start();

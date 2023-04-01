@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import Utils.Message;
 import Utils.IMessage;
+import java.util.ArrayList;
 
 
 /**
@@ -43,7 +44,7 @@ import Utils.IMessage;
  */
 public class TControlCentreProxy implements Runnable {
     
-    int ttlCustomers;
+    private int ttlCustomers;
     private final Socket socket;
     private final ILog_CCP mLogMessage;
     private final ObjectOutputStream out;
@@ -54,6 +55,7 @@ public class TControlCentreProxy implements Runnable {
     private final ILeavingHall mLeavingHall;
     private int floorsChecked = 0;
     private int tci,tbr,tbf;
+  
     
     private TControlCentreProxy(Socket socket, ILog_CCP mLogMessage) throws IOException {
         this.socket = socket;
@@ -64,6 +66,7 @@ public class TControlCentreProxy implements Runnable {
         this.CustCheckin = MCheckIn.getInstance((ILog_Customer) mLogMessage);
         this.mMealRoom = MMealRoom.getInstance((ILog_Customer) mLogMessage, this.CustCheckin);
         this.mLeavingHall = MLeavingHall.getInstance((ILog_Customer) mLogMessage);
+        //this.mLogMessage.ccp_idle();
         
     }
     public static Runnable getInstance(Socket socket, ILog_CCP mLogMessage) throws IOException {
@@ -74,7 +77,7 @@ public class TControlCentreProxy implements Runnable {
         this.tci = tci;
         this.tbr = tbr;
         this.tbf = tbf;
-       
+        mLogMessage.sendRun();
         OutCustomer.nextSimulation(ttlCustomers);
         mMealRoom.setttlCustomers(ttlCustomers);
         CustCheckin.settci(this.tci);
@@ -90,6 +93,7 @@ public class TControlCentreProxy implements Runnable {
               CustCheckin.setMode();
               OutCustomer.setMode();
           }
+         
           new Thread( TPorter.getInstance(0, (IOutside_Porter)OutCustomer, (ICheckIn_Porter) CustCheckin, ttlCustomers, (ILeavingHall_Porter) mLeavingHall)).start();
           for ( int i=0; i< 3; i++)
             new Thread( TReceptionist.getInstance(i, (ICheckIn_Receptionist) CustCheckin)).start();
@@ -112,6 +116,18 @@ public class TControlCentreProxy implements Runnable {
         
       
     }
+    private void suspend(){
+        OutCustomer.suspend();
+        CustCheckin.suspend();
+        mMealRoom.suspend();
+        mLeavingHall.suspend();
+    }
+    private void restart(){
+        OutCustomer.restart();
+        CustCheckin.restart();
+        mMealRoom.restart();
+        mLeavingHall.restart();
+    }
     @Override
     public void run() {
         
@@ -120,10 +136,10 @@ public class TControlCentreProxy implements Runnable {
         mLogMessage.ccp_idle();
        
          while(true) {
-             System.out.println("   Thread  is waiting for a new message" );
+             //System.out.println("   Thread  is waiting for a new message" );
             try {
                Message s = (Message) in.readObject();
-               s.print("Simulation");
+               //s.print("Simulation");
                
                if (s.code().equals("Next Simulation")){
                    int[] values = s.value();
@@ -140,6 +156,12 @@ public class TControlCentreProxy implements Runnable {
                };
                 if (s.code().equals("CheckOUT")){
                    callForCheckOut(s.value());
+               };
+               if (s.code().equals("Suspend")){
+                   suspend();
+               };
+               if (s.code().equals("Resume")){
+                   restart();
                };
               
           

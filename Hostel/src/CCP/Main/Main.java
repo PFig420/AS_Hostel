@@ -109,15 +109,13 @@ public class Main extends javax.swing.JFrame {
 
         jLabel3.setText("tbr");
 
-        jSpinner3.setModel(new javax.swing.SpinnerNumberModel(100, null, 1000, 100));
+        jSpinner3.setModel(new javax.swing.SpinnerNumberModel(100, 0, 1000, 100));
 
-        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(100, null, 1000, 100));
+        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(100, 0, 1000, 100));
 
         jLabel4.setText("tbf");
 
         jButton2.setText("Start Simulation");
-        jButton2.setSelected(true);
-        jButton2.setEnabled(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -125,7 +123,6 @@ public class Main extends javax.swing.JFrame {
         });
 
         jButton3.setText("CheckIn");
-        jButton3.setEnabled(false);
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -133,7 +130,6 @@ public class Main extends javax.swing.JFrame {
         });
 
         jButton4.setText("CheckOut");
-        jButton4.setEnabled(false);
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -159,7 +155,6 @@ public class Main extends javax.swing.JFrame {
         jLabel5.setText("Operating Mode");
 
         jButton5.setText("Step");
-        jButton5.setEnabled(false);
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
@@ -167,7 +162,6 @@ public class Main extends javax.swing.JFrame {
         });
 
         jButton6.setText("Suspend");
-        jButton6.setEnabled(false);
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton6ActionPerformed(evt);
@@ -175,7 +169,6 @@ public class Main extends javax.swing.JFrame {
         });
 
         jButton7.setText("Restart");
-        jButton7.setEnabled(false);
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
@@ -303,7 +296,7 @@ public class Main extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        System.out.print("JButton2");
+        //System.out.print("JButton2");
         
         int nCustomers = (Integer) jSpinner1.getValue();
         int tci = (Integer) jSpinner2.getValue();
@@ -321,14 +314,15 @@ public class Main extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         jButton3.setEnabled(true);
         jButton6.setEnabled(true);
         jButton7.setEnabled(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        jButton2.setEnabled(true);
+       jButton2.setEnabled(true);
+       //jButton6.setEnabled(false);
+       //jButton7.setEnabled(false);
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
@@ -337,17 +331,48 @@ public class Main extends javax.swing.JFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
+         //System.out.print("JButton3");
+       
+        int[] a = {};
+        
+       
+        
+        IMessage msgOut = Message.getInstance("Suspend", a );
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         // TODO add your handling code here:
+         System.out.print("JButton3");
+       
+        int[] a = {0};
+        
+        if(jRadioButton1.isSelected()){ //Automatico
+            a[0] = 0;
+        }
+        if(jRadioButton2.isSelected()){ //Manual
+            a[0] = 1;
+        }
+        
+        IMessage msgOut = Message.getInstance("Resume", a );
+        try {
+            out.writeObject(msgOut);
+            out.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton7ActionPerformed
 
 
     @SuppressWarnings("empty-statement")
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        System.out.print("JButton3");
+        //System.out.print("JButton3");
        
         int[] a = {0};
         
@@ -365,12 +390,10 @@ public class Main extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         jButton4.setEnabled(true);
         if (jRadioButton2.isSelected()) {
             jButton5.setEnabled(true);
         }
-      
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed

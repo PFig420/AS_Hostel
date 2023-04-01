@@ -13,5 +13,9 @@ public interface IOutside extends IOutside_Porter, IOutside_Customer {
     void nextSimulation(int i);
     void setMode();
     void advanceToNextStep();
+
+    public void suspend();
+
+    public void restart();
     
 }

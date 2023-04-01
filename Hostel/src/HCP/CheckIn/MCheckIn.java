@@ -15,6 +15,10 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.ArrayList; // import the ArrayList class
+
+
+
 /**
  *
  * @author omp
@@ -22,14 +26,21 @@ import java.util.logging.Logger;
 public class MCheckIn implements ICheckIn {
 
    
+    // Create an ArrayList object
     private ReentrantLock rl;
-    private final ReentrantLock rl2;
+    private ReentrantLock rl2;
+    
     private final ILog_Customer mLogCustomer;
     private final Condition cIsFull;
     private final Condition cWakeUp;
     private final Condition cRecepcionist;
     private final Condition cManual;
     private final Condition cManualInQueue;
+    
+    private ReentrantLock rlSuspension;
+    private final Condition cSuspension;
+    private boolean suspend = false;
+    
     private IMealRoom mMealRoom = null;
     private int mrCustomers = 0;
     private boolean manual = false;
@@ -49,14 +60,18 @@ public class MCheckIn implements ICheckIn {
     
     
     private MCheckIn(ILog_Customer mLogCustomer) {
+       
         rl = new ReentrantLock();
         rl2 = new ReentrantLock();
+        rlSuspension = new ReentrantLock();
         this.mLogCustomer = mLogCustomer;
+        cSuspension = rlSuspension.newCondition();
         cIsFull = rl.newCondition();
         cWakeUp = rl.newCondition();
         cRecepcionist = rl.newCondition();
         cManual = rl2.newCondition();
         cManualInQueue = rl2.newCondition();
+      
         for (int i = 0; i < 3; i++) {
             floor1[i] = MBedroom.getInstance((ILog_Customer)mLogCustomer, i, 1);
             floor2[i] = MBedroom.getInstance((ILog_Customer)mLogCustomer, i, 2);
@@ -67,13 +82,23 @@ public class MCheckIn implements ICheckIn {
     /**
      *
      * @param mLogCustomer
-     * @return
+     * @return the HCP.CheckIn.ICheckIn
      */
     public static ICheckIn getInstance(ILog_Customer mLogCustomer) {
         return new MCheckIn(mLogCustomer);
     }
     @Override
     public void inQueue(int customerId){
+        if(suspend){
+            try {
+                rlSuspension.lock();
+                cSuspension.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+            }  finally {
+                rlSuspension.unlock();
+            }
+        }
         //System.out.println("HEllo");
        
         int order;
@@ -104,7 +129,7 @@ public class MCheckIn implements ICheckIn {
             }
             countMan++;
         }
-        mLogCustomer.in( head, count, customerId);
+       
         count++;
         order = head++;
         
@@ -117,7 +142,7 @@ public class MCheckIn implements ICheckIn {
             }
         wakeUp--;
         tail++;
-        
+        //customerQueue.add(customerId);
         if ( wakeUp > 0 && isNotEmpty() )
             cWakeUp.signalAll();
         if ( isFull() )
@@ -188,6 +213,16 @@ public class MCheckIn implements ICheckIn {
      */
     @Override
     public IBedroom assignRoomToCustomer(int customerId) {
+        if(suspend){
+            try {
+                rlSuspension.lock();
+                cSuspension.await();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+            }  finally {
+                rlSuspension.unlock();
+            }
+        }
         
         try {
             //mLogCustomer.recepcionist(receptionistId);
@@ -289,6 +324,18 @@ public class MCheckIn implements ICheckIn {
             floor2[i].settbr(this.tbr);
             floor3[i].settbr(this.tbr);
         }
+    }
+
+    @Override
+    public void suspend() {
+        suspend = true;
+    }
+     @Override
+    public void restart() {
+        suspend = false;
+        rlSuspension.lock();
+        cSuspension.signalAll();
+        rlSuspension.unlock();
     }
     
 }

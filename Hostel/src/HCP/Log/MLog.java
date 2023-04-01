@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import java.io.File;  // Import the File class
 import java.io.IOException;  // Import the IOException class to handle errors
 import java.io.FileWriter;   // Import the FileWriter class
+import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 /**
  *
@@ -18,176 +19,145 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class MLog implements ILog {
     private final ReentrantLock rl;
-    boolean append = true;
-    File file = new File("logger.txt");  
-    //fileWrt = new FileWriter(file);
-
-    //Logger logger = Logger.getLogger("com.javacodegeeks.snippets.core");
+    private FileWriter filewriter;
     
     private MLog() {
         rl = new ReentrantLock();
+        try {
+            //File file = new File("Hostel/src/HCP/Log/log.txt");
+            filewriter = new FileWriter("log.txt");
+            writeString("                   (MCI)                   FLOOR 1 (MBR - bed)           FLOOR 2 (MBR - bed)         FLOOR 3 (MBR - bed)");
+            writeString("| ST | DR P1 P2 P3 P4 P5 P6 R1 R2 R3 | 11 12 13 21 22 23 31 32 33 | 11 12 13 21 22 23 31 32 33 | 11 12 13 21 22 23 31 32 33 |");
+        } catch (IOException ex) {
+            //javax.swing.JOptionPane.showMessageDialog(null,"It was not possible to access the log.txt file");
+        }
     }
     public static ILog getInstance() {
         return new MLog();
     }
-    @Override
-    public void meh_inQueue(int customerId) {
-        try {
-            rl.lock();
-            System.out.println("Inside the queue "+customerId+"\n");
-            //files.write("Files in Java might be tricky, but it is fun enough!");
-        } finally {
-            rl.unlock();
-        }
-    }
-    /**
-     *
-     */
+    
     @Override
     public void ccp_idle() {
-        try {
-            rl.lock();
-            System.out.println("I'm idle");
-        } finally {
-            rl.unlock();
+       writeString("| ID |                               |                            |                            |                            |");
+    }
+    
+    @Override
+    public void sendRun() {
+        writeString("| RN |                               |                            |                            |                            |");
+    }
+
+    public void sendSuspend() {
+        writeString("| SP |                               |                            |                            |                            |");
+    }
+
+    public void sendResume() {
+        writeString("| RS |                               |                            |                            |                            |");
+    }
+
+    public void sendManual() {
+        writeString("| MN |                               |                            |                            |                            |");
+    }
+
+    public void sendStep() {
+        writeString("| ST |                               |                            |                            |                            |");
+    }
+
+    public void sendAuto() {
+        writeString("| AU |                               |                            |                            |                            |");
+    }
+
+    public void sendCheckin() {
+        writeString("| CI |                               |                            |                            |                            |");
+    }
+
+    public void sendCheckout() {
+        writeString("| CO |                               |                            |                            |                            |");
+    }
+
+    public void recepcionist(int id) {
+        if (id == 0) {
+            writeString("|    |                      RC       |                            |                            |                            |");
+        }
+        if (id == 1) {
+            writeString("|    |                         RC    |                            |                            |                            |");
+        }
+        if (id == 2) {
+            writeString("|    |                            RC |                            |                            |                            |");
         }
     }
 
-    @Override
-    public void isFull(int customerId) {
-         try {
-            rl.lock();
-            System.out.println("Queue is Full.\n");
-        } finally {
-            rl.unlock();
+    public void custAsleep(int id, int roomNumber, int floorNumber) {
+        if (floorNumber == 1 && roomNumber == 1) {
+            writeString("|    |                               | " + id + "                         |                            |                            |");
+            writeString("|    |                               |    " + id + "                      |                            |                            |");
+            writeString("|    |                               |       " + id + "                   |                            |                            |");
+        }
+        if (floorNumber == 1 && roomNumber == 2) {
+            writeString("|    |                               |          " + id + "                |                            |                            |");
+            writeString("|    |                               |             " + id + "             |                            |                            |");
+            writeString("|    |                               |                " + id + "          |                            |                            |");      
+        }
+        if (floorNumber == 1 && roomNumber == 3) {
+            writeString("|    |                               |                   " + id + "       |                            |                            |");
+            writeString("|    |                               |                      " + id + "    |                            |                            |");
+            writeString("|    |                               |                         " + id + " |                            |                            |");
+        }
+    }
+
+    public void goToBath(int customerId, int roomNumber, int floorNumber) {
+        if (floorNumber == 1 && roomNumber == 1) {
+            writeString("|    | " + customerId + "       |                            |                            |                            |                             |");
+        }
+        if (floorNumber == 1 && roomNumber == 2) {
+            writeString("|    |    " + customerId + "    |                            |                            |                            |                             |");
+        }
+        if (floorNumber == 1 && roomNumber == 3) {
+            writeString("|    |       " + customerId + " |                            |                            |                            |                             |");
         }
     }
     
-    public void in( int head, int count, int id ) {
-       
+    
+     private void writeString (String str_to_write) {
         try {
-            rl.lock();
-            System.out.println("In: " + head + ", " + count + ", " + id+"\n");
-        } finally {
-            rl.unlock();
+            filewriter.write(str_to_write + "\n");
+            //filewriter.close();
+            System.out.println(str_to_write);
+        } catch (IOException ex) {
+            System.out.println("Failed to print to file!");
         }
     }
-
-    @Override
-    public void out(int order, int count, int customerId) {
-         try {
-            rl.lock();
-            System.out.println("Out: " + order + ", " + count + ", " + customerId+"\n");
-        } finally {
-            rl.unlock();
-        }
-    }
-
-    @Override
-    public void recepcionist(int id) {
-         try {
-            rl.lock();
-             System.out.print("Recepcionist "+id+" is on.\n");
-        } finally {
-            rl.unlock();
-        }
-         
-    }
-
-    @Override
-    public void custAsleep(int id, int roomNumber, int floorNumber) {
-      try {
-            rl.lock();
-             System.out.print("Customer "+id+" is asleep in room "+floorNumber+roomNumber+"\n");
-        } finally {
-            rl.unlock();
-        }
-    }
-
-    @Override
-    public void porterCall() {
+     
+       public void closeWriter() {
         try {
-            rl.lock();
-             System.out.print("Porter call to customers: Service Open\n");
-        } finally {
-            rl.unlock();
-        }
-       
-    }
-
-    @Override
-    public void goToBath(int customerId, int roomNumber, int floorNumber) {
-        try {
-            rl.lock();
-             System.out.print("Customer "+customerId+" has woken up in room "+floorNumber+roomNumber+"\n");
-        } finally {
-            rl.unlock();
+            this.filewriter.close();
+        } catch (IOException ex) {
+           
         }
     }
 
     @Override
-    public void satDown(int customerId) {
-        try {
-            rl.lock();
-             System.out.print("Customer "+customerId+" has sat down at breakfast table.\n");
-        } finally {
-            rl.unlock();
-        }
+    public void sendOpen() {
+        writeString("|    | OP                            |                            |                            |                            |");
     }
 
     @Override
-    public void waiterReadyToDeliverFood(int waiterId) {
-       try {
-            rl.lock();
-             System.out.print("Waiter "+waiterId+" ready to deliver food.\n");
-        } finally {
-            rl.unlock();
-        }
+    public void sendClose() {
+        writeString("|    | CL                            |                            |                            |                            |");
     }
 
+    /**
+     *
+     * @param q
+     */
     @Override
-    public void gotBreakfast(int customerId) {
-         try {
-            rl.lock();
-             System.out.print("Customer "+customerId+" got breakfast.\n");
-        } finally {
-            rl.unlock();
-        } }
+    public void sendQueue(ArrayList<Integer> q) {
+        writeString("|    | "+ q.toString() +"  |                            |                            |                            |");
+     }
 
-    @Override
-    public void AwaitingToLeave(int customerId) {
-         try {
-            rl.lock();
-             System.out.print("Customer "+customerId+" is waiting to leave.\n");
-        } finally {
-            rl.unlock();
-        } 
-    }
+  
 
-    @Override
-    public void WaitingToOpenDoor(int porterId) {
-        try {
-            rl.lock();
-             System.out.print("Porter "+porterId+" awaiting to open the door.\n");
-        } finally {
-            rl.unlock();
-        } 
-    }
+    
 
-    @Override
-    public void walking(int customerId) {
-        try {
-            rl.lock();
-             System.out.print("Customer "+customerId+" is walking outside.\n");
-        } finally {
-            rl.unlock();
-        } 
-    }
-
-    @Override
-    public void closeWriter() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 }
     
     
