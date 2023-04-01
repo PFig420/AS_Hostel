@@ -183,6 +183,11 @@ public class MLog implements ILog {
             rl.unlock();
         } 
     }
+
+    @Override
+    public void closeWriter() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
     
     

@@ -9,7 +9,7 @@ package HCP.Log;
  * @author omp
  */
 public interface ILog_Customer {
-    void meh_inQueue(int customrerId);
+    void meh_inQueue(int customerId);
 
     public void isFull(int customerId);
 
@@ -31,5 +31,7 @@ public interface ILog_Customer {
     public void WaitingToOpenDoor(int porterId);
 
     public void walking(int customerId);
+
+    void closeWriter();
  
 }
