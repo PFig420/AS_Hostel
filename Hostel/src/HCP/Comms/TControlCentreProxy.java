@@ -101,6 +101,7 @@ public class TControlCentreProxy implements Runnable {
             
               //CustCheckin.setMode();
               OutCustomer.setMode();
+              mMealRoom.setMode();
           }
           /*new Thread( TPorter.getInstance(0, (IOutside_Porter)OutCustomer, (ICheckIn_Porter) CustCheckin, ttlCustomers)).start();
           for ( int i=0; i< 3; i++)
@@ -135,6 +136,7 @@ public class TControlCentreProxy implements Runnable {
                 if (s.code().equals("Step")){
                   CustCheckin.advanceToNextStep();
                   OutCustomer.advanceToNextStep();
+                  mMealRoom.advanceToNextStep();
                };
                 if (s.code().equals("CheckOUT")){
                    callForCheckOut(s.value());

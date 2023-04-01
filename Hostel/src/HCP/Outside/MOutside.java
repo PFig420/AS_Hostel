@@ -67,23 +67,11 @@ public class MOutside implements IOutside {
     }
     @Override
     public void comeIn(int nCustomers) {
-         if(manual){
-             
-                try {
-                    rl2.lock();
-                    System.out.println("Here");
-                    cManual.await();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
-                }  finally {
-                    rl2.unlock();
-                }
-            
-        }
+         
         try {
            
             rl.lock();
-            System.out.print("Porter in COmein");
+           
             this.nCustomers = nCustomers;
             cWaitTurn.signalAll();
         } finally {
@@ -96,6 +84,7 @@ public class MOutside implements IOutside {
      */
     @Override
     public void waitTurn(int customerId) {
+       
          
        
         try {
@@ -109,6 +98,20 @@ public class MOutside implements IOutside {
             nCustomers--;
         } finally {
             rl.unlock();
+        }
+        if(manual){
+             
+                try {
+                    rl2.lock();
+                    
+                    cManual.await();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MCheckIn.class.getName()).log(Level.SEVERE, null, ex);
+                }  finally {
+                    rl2.unlock();
+                  
+                }
+            
         }
        
     }
@@ -124,7 +127,10 @@ public class MOutside implements IOutside {
     public void advanceToNextStep() {
         
         rl2.lock();
-        cManual.signalAll();
-        rl2.unlock();
+        try {
+            cManual.signalAll();
+        } finally {
+            rl2.unlock();
+        }
     }
 }
