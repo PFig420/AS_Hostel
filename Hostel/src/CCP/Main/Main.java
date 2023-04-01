@@ -116,6 +116,8 @@ public class Main extends javax.swing.JFrame {
         jLabel4.setText("tbf");
 
         jButton2.setText("Start Simulation");
+        jButton2.setSelected(true);
+        jButton2.setEnabled(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -123,6 +125,7 @@ public class Main extends javax.swing.JFrame {
         });
 
         jButton3.setText("CheckIn");
+        jButton3.setEnabled(false);
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -130,6 +133,7 @@ public class Main extends javax.swing.JFrame {
         });
 
         jButton4.setText("CheckOut");
+        jButton4.setEnabled(false);
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -155,6 +159,7 @@ public class Main extends javax.swing.JFrame {
         jLabel5.setText("Operating Mode");
 
         jButton5.setText("Step");
+        jButton5.setEnabled(false);
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
@@ -162,6 +167,7 @@ public class Main extends javax.swing.JFrame {
         });
 
         jButton6.setText("Suspend");
+        jButton6.setEnabled(false);
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton6ActionPerformed(evt);
@@ -169,6 +175,7 @@ public class Main extends javax.swing.JFrame {
         });
 
         jButton7.setText("Restart");
+        jButton7.setEnabled(false);
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
@@ -314,18 +321,18 @@ public class Main extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        jButton3.setEnabled(true);
+        jButton6.setEnabled(true);
+        jButton7.setEnabled(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-       jButton5.setEnabled(false);
-       jButton6.setEnabled(false);
-       jButton7.setEnabled(false);
+        jButton2.setEnabled(true);
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-        jButton5.setEnabled(true);
-        jButton6.setEnabled(true);
-        jButton7.setEnabled(true);
+        jButton2.setEnabled(true);
     }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -357,6 +364,11 @@ public class Main extends javax.swing.JFrame {
             out.flush();
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        jButton4.setEnabled(true);
+        if (jRadioButton2.isSelected()) {
+            jButton5.setEnabled(true);
         }
       
     }//GEN-LAST:event_jButton3ActionPerformed
