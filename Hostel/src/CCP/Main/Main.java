@@ -314,6 +314,7 @@ public class Main extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
+<<<<<<< HEAD
         jButton3.setEnabled(true);
         jButton6.setEnabled(true);
         jButton7.setEnabled(true);
@@ -323,10 +324,20 @@ public class Main extends javax.swing.JFrame {
        jButton2.setEnabled(true);
        //jButton6.setEnabled(false);
        //jButton7.setEnabled(false);
+=======
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+       jButton5.setEnabled(false);
+       jButton6.setEnabled(false);
+       jButton7.setEnabled(false);
+>>>>>>> parent of 424cb76 (CCP main updated)
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-        jButton2.setEnabled(true);
+        jButton5.setEnabled(true);
+        jButton6.setEnabled(true);
+        jButton7.setEnabled(true);
     }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -390,10 +401,14 @@ public class Main extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
+<<<<<<< HEAD
         jButton4.setEnabled(true);
         if (jRadioButton2.isSelected()) {
             jButton5.setEnabled(true);
         }
+=======
+      
+>>>>>>> parent of 424cb76 (CCP main updated)
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
